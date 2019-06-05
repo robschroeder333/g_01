@@ -1,29 +1,28 @@
-extends KinematicBody
+extends RigidBody
 
-var speed = 300
+var walk = 3
+var run = 5
+var terminalVelocity = 3
 var direction = Vector3()
 
 func _ready():
 	# Called when the node is added to the scene for the first time.
 	# Initialization here
+	set_friction(0.5)
 	pass
 
 func _physics_process(delta):
 	handleMovement(delta)
 	
 func handleMovement(d):
+	var speed = run # TODO: set walk vs run here
 	direction = Vector3(0,0,0)
 	if Input.is_action_pressed("ui_left"):
-		direction.x -= 1
+		direction.x += run
 	if Input.is_action_pressed("ui_right"):
-		direction.x += 1
+		direction.x -= run
 	if Input.is_action_pressed("ui_up"):
-		direction.z -= 1
+		direction.z += run
 	if Input.is_action_pressed("ui_down"):
-		direction.z += 1
-	direction = direction * speed * d
-	move_and_slide(direction)
-	
-func gravity():
-	
-	
+		direction.z -= run
+	apply_central_impulse(direction)
