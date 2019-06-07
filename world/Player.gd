@@ -15,13 +15,17 @@ func _physics_process(delta):
 	
 func handleMovement(d):
 	var speed = run # TODO: set walk vs run here
+	var grounded = $GroundRay.is_colliding()
 	direction = Vector3(0,0,0)
-	if Input.is_action_pressed("ui_left"):
-		direction.x += run
-	if Input.is_action_pressed("ui_right"):
-		direction.x -= run
-	if Input.is_action_pressed("ui_up"):
-		direction.z += run
-	if Input.is_action_pressed("ui_down"):
-		direction.z -= run
-	apply_central_impulse(direction)
+	if grounded:
+		if Input.is_action_pressed("ui_left"):
+			direction.x += run
+		if Input.is_action_pressed("ui_right"):
+			direction.x -= run
+		if Input.is_action_pressed("ui_up"):
+			direction.z += run
+		if Input.is_action_pressed("ui_down"):
+			direction.z -= run
+		apply_central_impulse(direction)
+	if Input.is_action_just_pressed("ui_accept") && grounded:
+		set_axis_velocity(Vector3(0,15,0))

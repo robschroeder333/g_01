@@ -31,5 +31,10 @@ material/0 = null
 transform = Transform( 1, 0, 0, 0, -4.37114e-008, -1, 0, 1, -4.37114e-008, 0, 0, 0 )
 shape = SubResource( 3 )
 
-[node name="Camera" type="Camera" parent="CollisionShape"]
-transform = Transform( -1, -8.70901e-008, -7.6194e-009, 0, 0.0871558, -0.996195, 8.74228e-008, -0.996195, -0.0871558, 0, -5, -2 )
+[node name="Camera" type="Camera" parent="."]
+transform = Transform( -1, -8.70901e-008, -7.6194e-009, -8.74228e-008, 0.996195, 0.0871558, -3.82137e-015, 0.0871558, -0.996195, 0, 2, -5 )
+
+[node name="GroundRay" type="RayCast" parent="."]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0 )
+enabled = true
+cast_to = Vector3( 0, -0.6, 0 )
