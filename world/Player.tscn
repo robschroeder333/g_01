@@ -1,6 +1,8 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=6 format=2]
 
 [ext_resource path="res://world/Player.gd" type="Script" id=1]
+
+[sub_resource type="PhysicsMaterial" id=4]
 
 [sub_resource type="SpatialMaterial" id=1]
 albedo_color = Color( 0.732903, 0.832031, 0.0390015, 1 )
@@ -12,7 +14,9 @@ material = SubResource( 1 )
 [sub_resource type="CapsuleShape" id=3]
 
 [node name="Player" type="RigidBody"]
-mass = 20.86
+mass = 2.60918
+physics_material_override = SubResource( 4 )
+continuous_cd = true
 axis_lock_angular_x = true
 axis_lock_angular_z = true
 angular_damp = 1.0

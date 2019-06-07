@@ -1,14 +1,13 @@
 extends RigidBody
 
 var walk = 3
-var run = 5
+var run = 3
 var terminalVelocity = 3
 var direction = Vector3()
 
 func _ready():
 	# Called when the node is added to the scene for the first time.
 	# Initialization here
-	set_friction(0.5)
 	pass
 
 func _physics_process(delta):
