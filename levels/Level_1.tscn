@@ -18,5 +18,20 @@ transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -5.356, 3, 9.181 )
 [node name="Wall2" parent="Floor" instance=ExtResource( 2 )]
 transform = Transform( 0.634489, 0, 0.386466, 0, 1, 0, -1.54586, 0, 0.634489, 4.774, 5, -0.418 )
 
+[node name="Wall7" parent="Floor" instance=ExtResource( 2 )]
+transform = Transform( 0.634489, 0, 0.386466, 0, 1, 0, -1.54586, 0, 0.634489, 0.256081, 18.8465, 11.5175 )
+
+[node name="Wall8" parent="Floor" instance=ExtResource( 2 )]
+transform = Transform( 0.688312, 0, -0.362706, 0, 1, 0, 1.45082, 0, 0.688314, -3.3524, 47.7016, 1.45167 )
+
+[node name="Wall4" parent="Floor" instance=ExtResource( 2 )]
+transform = Transform( 0.634487, 0, 0.687355, 0, 10, 0, -1.54585, 0, 0.282121, 6.7015, 16.2491, 3.98572 )
+
+[node name="Wall5" parent="Floor" instance=ExtResource( 2 )]
+transform = Transform( -0.0861618, 0, 0.590288, 0, 10, 0, -1.99255, 0, -0.758722, -8.86516, 16.2491, -0.140202 )
+
+[node name="Wall6" parent="Floor" instance=ExtResource( 2 )]
+transform = Transform( 0.998667, 0, 0.358638, 0, 10, 0, -0.10304, 0, 1.20621, -2.65019, 16.2491, -10.5994 )
+
 [node name="Player" parent="." instance=ExtResource( 3 )]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6, 0 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 57.0143, 0 )
