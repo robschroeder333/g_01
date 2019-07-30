@@ -18,14 +18,14 @@ func handleMovement(d):
 	var grounded = $GroundRay.is_colliding()
 	direction = Vector3(0,0,0)
 	if grounded:
-		if Input.is_action_pressed("ui_left"):
+		if Input.is_action_pressed("i_left"):
 			direction.x += run
-		if Input.is_action_pressed("ui_right"):
+		if Input.is_action_pressed("i_right"):
 			direction.x -= run
-		if Input.is_action_pressed("ui_up"):
+		if Input.is_action_pressed("i_forward"):
 			direction.z += run
-		if Input.is_action_pressed("ui_down"):
+		if Input.is_action_pressed("i_back"):
 			direction.z -= run
 		apply_central_impulse(direction)
-	if Input.is_action_just_pressed("ui_accept") && grounded:
+	if Input.is_action_just_pressed("i_jump") && grounded:
 		set_axis_velocity(Vector3(0,15,0))
