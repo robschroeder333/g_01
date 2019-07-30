@@ -1,6 +1,8 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=6 format=2]
 
 [ext_resource path="res://world/Player.gd" type="Script" id=1]
+
+[sub_resource type="PhysicsMaterial" id=4]
 
 [sub_resource type="SpatialMaterial" id=1]
 albedo_color = Color( 0.732903, 0.832031, 0.0390015, 1 )
@@ -12,7 +14,9 @@ material = SubResource( 1 )
 [sub_resource type="CapsuleShape" id=3]
 
 [node name="Player" type="RigidBody"]
-mass = 20.86
+mass = 2.60918
+physics_material_override = SubResource( 4 )
+continuous_cd = true
 axis_lock_angular_x = true
 axis_lock_angular_z = true
 angular_damp = 1.0
@@ -27,5 +31,10 @@ material/0 = null
 transform = Transform( 1, 0, 0, 0, -4.37114e-008, -1, 0, 1, -4.37114e-008, 0, 0, 0 )
 shape = SubResource( 3 )
 
-[node name="Camera" type="Camera" parent="CollisionShape"]
-transform = Transform( -1, -8.70901e-008, -7.6194e-009, 0, 0.0871558, -0.996195, 8.74228e-008, -0.996195, -0.0871558, 0, -5, -2 )
+[node name="Camera" type="Camera" parent="."]
+transform = Transform( -1, -8.70901e-008, -7.6194e-009, -8.74228e-008, 0.996195, 0.0871558, -3.82137e-015, 0.0871558, -0.996195, 0, 2, -5 )
+
+[node name="GroundRay" type="RayCast" parent="."]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0 )
+enabled = true
+cast_to = Vector3( 0, -0.6, 0 )
