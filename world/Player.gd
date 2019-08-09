@@ -44,12 +44,16 @@ func handleCamera(l, r, delta):
 	var combined = l + r
 	var h_speed = 1
 	var v_speed = 5
-	$Internal.rotate_y(-combined.x * h_speed * delta)
+	var i = $Internal
+	var springBackSpeed = 1
+	i.rotate_y(-combined.x * h_speed * delta)
+	
 	var target = $Internal/Forward
 	target.translation.y = clamp(target.translation.y + combined.y * v_speed * delta, -10, 10)
 	$Internal/Camera.look_at(target.get_global_transform().origin, Vector3.UP)
-	#TODO: slerp player towards internal rotation?
-	
+	i.rotation_degrees.y = i.rotation_degrees.y + (0 - i.rotation_degrees.y) * springBackSpeed * 0.5 * delta
+	#TODO: make rotation on rigidbody impulse based
+	self.rotation_degrees.y = self.rotation_degrees.y + (i.rotation_degrees.y - self.rotation_degrees.y) * springBackSpeed * delta
 
 func handleCursors(l, r):
 	var centering = cSize * 0.5
