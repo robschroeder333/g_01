@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=2]
+[gd_scene load_steps=10 format=2]
 
 [ext_resource path="res://world/Player.gd" type="Script" id=1]
 [ext_resource path="res://world/Aot_Cursor/AoT_cursor_L.png" type="Texture" id=2]
@@ -16,6 +16,8 @@ material = SubResource( 2 )
 [sub_resource type="CapsuleShape" id=4]
 
 [sub_resource type="CubeMesh" id=5]
+
+[sub_resource type="CubeMesh" id=6]
 
 [node name="Player" type="RigidBody"]
 mass = 2.60918
@@ -40,26 +42,7 @@ transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0 )
 enabled = true
 cast_to = Vector3( 0, -0.6, 0 )
 
-[node name="CursorBounds" type="Spatial" parent="."]
-editor/display_folded = true
-transform = Transform( 15, 0, 0, 0, 9, 0, 1.93268e-012, 0, 1, -1.31134e-006, 1.5, -3.309 )
-
-[node name="MeshInstance" type="MeshInstance" parent="CursorBounds"]
-visible = false
-mesh = SubResource( 5 )
-material/0 = null
-
-[node name="Camera" type="Camera" parent="."]
-transform = Transform( -1, 0, 8.74228e-008, 0, 1, 0, -8.74228e-008, 0, -1, 0, 1.5, -5 )
-
-[node name="Cursor_L" type="Sprite3D" parent="Camera"]
-transform = Transform( -1, 0, -1.50996e-007, 0, 1, 0, 1.50996e-007, 0, -1, 2.84217e-014, 0, -2 )
-visible = false
-flip_h = true
-pixel_size = 0.0005
-texture = ExtResource( 2 )
-
-[node name="Left" type="TextureRect" parent="."]
+[node name="Cursor_L" type="TextureRect" parent="."]
 margin_left = 781.846
 margin_top = 314.787
 margin_right = 958.846
@@ -68,7 +51,7 @@ texture = ExtResource( 2 )
 expand = true
 stretch_mode = 6
 
-[node name="Right" type="TextureRect" parent="."]
+[node name="Cursor_R" type="TextureRect" parent="."]
 margin_left = 781.846
 margin_top = 314.787
 margin_right = 958.846
@@ -76,3 +59,31 @@ margin_bottom = 491.787
 texture = ExtResource( 3 )
 expand = true
 stretch_mode = 6
+
+[node name="Internal" type="Spatial" parent="."]
+
+[node name="Forward" type="Spatial" parent="Internal"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.73177, 4.32796 )
+
+[node name="MeshInstance" type="MeshInstance" parent="Internal/Forward"]
+transform = Transform( 0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0, 0 )
+mesh = SubResource( 5 )
+material/0 = null
+
+[node name="Camera" type="Camera" parent="Internal"]
+transform = Transform( -1, 0, 8.74228e-008, 0, 1, 0, -8.74228e-008, 0, -1, 0, 1.5, -5 )
+
+[node name="Behind" type="Spatial" parent="Internal"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.29655, -3.99095 )
+
+[node name="Tween" type="Tween" parent="."]
+playback_speed = 0.3
+playback/speed = 0.3
+
+[node name="Spatial" type="Spatial" parent="."]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1.3394 )
+
+[node name="MeshInstance" type="MeshInstance" parent="Spatial"]
+transform = Transform( 0.5, 0, 0, 0, 2, 0, 0, 0, 0.5, 0, 0, 0 )
+mesh = SubResource( 6 )
+material/0 = null

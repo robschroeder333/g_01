@@ -14,14 +14,14 @@ func _ready():
 	# Called when the node is added to the scene for the first time.
 	# Initialization here
 	view = get_viewport().get_visible_rect()
-	initCursor($Left,$Right)
+	initCursor($Cursor_L, $Cursor_R)
 	pass
 
 func _physics_process(delta):
 	grounded = $GroundRay.is_colliding()
 	handleMovement(delta)
 	analogInput()
-	handleCamera(left, right)
+	handleCamera(left, right, delta)
 	handleCursors(left, right)
 	
 func handleMovement(d):
@@ -40,13 +40,19 @@ func handleMovement(d):
 	if Input.is_action_just_pressed("i_jump") && grounded:
 		set_axis_velocity(Vector3(0,15,0))
 		
-func handleCamera(l, r):
+func handleCamera(l, r, delta):
 	var combined = l + r
+	var h_speed = 1
+	var v_speed = 5
+	$Internal.rotate_y(-combined.x * h_speed * delta)
+	var target = $Internal/Forward
+	target.translation.y = clamp(target.translation.y + combined.y * v_speed * delta, -10, 10)
+	$Internal/Camera.look_at(target.get_global_transform().origin, Vector3.UP)
+	#TODO: slerp player towards internal rotation?
+	
 
 func handleCursors(l, r):
 	var centering = cSize * 0.5
-	var c_Left = $Left
-	var c_Right = $Right
 	var bounds = view.size
 	var b_center = bounds.x * 0.5
 	var yLimit = bounds.y * 0.5
@@ -58,8 +64,8 @@ func handleCursors(l, r):
 	
 	t_left = Vector2(clamp(t_left.x, 0, b_center), clamp(t_left.y, 0, bounds.y))
 	t_right = Vector2(clamp(t_right.x, b_center, bounds.x), clamp(t_right.y, 0, bounds.y))
-	c_Left.rect_position = centerCursor(t_left, centering)
-	c_Right.rect_position = centerCursor(t_right, centering)
+	$Cursor_L.rect_position = centerCursor(t_left, centering)
+	$Cursor_R.rect_position = centerCursor(t_right, centering)
 
 func centerCursor(cursor, centering):
 	cursor.x -= centering
