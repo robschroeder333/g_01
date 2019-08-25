@@ -23,7 +23,20 @@ func _physics_process(delta):
 	analogInput()
 	handleCamera(left, right, delta)
 	handleCursors(left, right)
-	
+
+#func _integrate_forces(state):
+#    var target_position = $Internal/Forward.get_global_transform().origin
+#    look_follow(state, get_global_transform(), target_position)
+#
+#func look_follow(state, current_transform, target_position):
+#	var adjuster = 30
+#	var up_dir = Vector3(0, 1, 0)
+#	var cur_dir = current_transform.basis.xform(Vector3(0, 0, 1))
+#	var target_dir = (target_position - current_transform.origin).normalized()
+#	var rotation_angle = acos(cur_dir.x) - acos(target_dir.x)
+#
+#	state.set_angular_velocity(up_dir * (rotation_angle / state.get_step() * adjuster))
+		
 func handleMovement(d):
 	var speed = run # TODO: set walk vs run here
 	direction = Vector3(0,0,0)
@@ -36,7 +49,8 @@ func handleMovement(d):
 			direction.z += run
 		if Input.is_action_pressed("i_back"):
 			direction.z -= run
-		apply_central_impulse(direction)
+		#needs to adjust to local rotation
+		apply_central_impulse(get_transform().basis.xform(direction))
 	if Input.is_action_just_pressed("i_jump") && grounded:
 		set_axis_velocity(Vector3(0,15,0))
 		
@@ -44,17 +58,34 @@ func handleCamera(l, r, delta):
 	var combined = l + r
 	var h_speed = 1
 	var v_speed = 5
-	var i = $Internal
 	var springBackSpeed = 1
-	i.rotate_y(-combined.x * h_speed * delta)
-	
+	var turnSpeed = 30
+	var i = $Internal
 	var target = $Internal/Forward
+	
+	#Handle Horizontal
+	i.rotate_y(-combined.x * h_speed * delta)
+	#i.rotation_degrees.y = i.rotation_degrees.y + (0 - i.rotation_degrees.y) * springBackSpeed * 0.5 * delta
+	
+	#Handle vertical
 	target.translation.y = clamp(target.translation.y + combined.y * v_speed * delta, -10, 10)
 	$Internal/Camera.look_at(target.get_global_transform().origin, Vector3.UP)
-	i.rotation_degrees.y = i.rotation_degrees.y + (0 - i.rotation_degrees.y) * springBackSpeed * 0.5 * delta
 	#TODO: make rotation on rigidbody impulse based
-	self.rotation_degrees.y = self.rotation_degrees.y + (i.rotation_degrees.y - self.rotation_degrees.y) * springBackSpeed * delta
-
+	
+	#Handle auto-turn
+	#turnTarget needs to be the local difference, not global
+	var turnTarget = transform.looking_at(i.get_transform().origin, Vector3.UP).basis.y.x# - transform.basis.y.x
+	print(turnTarget)
+	var check = get_angular_velocity().y
+	var deadzone = 0.25
+	if(turnTarget > -deadzone && turnTarget < deadzone):
+		self.add_torque(Vector3.ZERO)
+	elif(turnTarget < -deadzone):
+		self.add_torque(Vector3.UP * turnSpeed)
+	elif(turnTarget > deadzone):
+		self.add_torque(Vector3.UP * -turnSpeed)
+	
+	
 func handleCursors(l, r):
 	var centering = cSize * 0.5
 	var bounds = view.size
