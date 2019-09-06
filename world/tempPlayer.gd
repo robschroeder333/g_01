@@ -1,7 +1,7 @@
 extends KinematicBody
 
 var walk = 3
-var run = 3
+var run = 15
 var terminalVelocity = 3
 var direction = Vector3()
 var left = Vector2()
@@ -18,7 +18,7 @@ func _ready():
 	pass
 
 func _physics_process(delta):
-	grounded = $GroundRay.is_colliding()
+	grounded = is_on_floor()
 	handleMovement(delta)
 	analogInput()
 	handleCamera(left, right, delta)
@@ -40,7 +40,7 @@ func _physics_process(delta):
 func handleMovement(d):
 	var speed = run # TODO: set walk vs run here
 	direction = Vector3(0,0,0)
-	if grounded:
+	if true:
 		if Input.is_action_pressed("i_left"):
 			direction.x += 1
 		if Input.is_action_pressed("i_right"):
@@ -51,6 +51,7 @@ func handleMovement(d):
 			direction.z -= 1
 		#needs to adjust to local rotation
 		direction *= run
+		direction += Vector3.DOWN
 		move_and_slide(direction)
 	if Input.is_action_just_pressed("i_jump") && grounded:
 		move_and_slide(Vector3(0,15,0))
@@ -66,7 +67,7 @@ func handleCamera(l, r, delta):
 
 	#Handle Horizontal
 	i.rotate_y(-combined.x * h_speed * delta)
-	#i.rotation_degrees.y = i.rotation_degrees.y + (0 - i.rotation_degrees.y) * springBackSpeed * 0.5 * delta
+	i.rotation_degrees.y = i.rotation_degrees.y + (0 - i.rotation_degrees.y) * springBackSpeed * 0.5 * delta
 
 	#Handle vertical
 	target.translation.y = clamp(target.translation.y + combined.y * v_speed * delta, -10, 10)
@@ -76,7 +77,6 @@ func handleCamera(l, r, delta):
 	#Handle auto-turn
 	#turnTarget needs to be the local difference, not global
 	var turnTarget = transform.looking_at(i.get_transform().origin, Vector3.UP).basis.y.x# - transform.basis.y.x
-	print(turnTarget)
 #	var check = get_angular_velocity().y
 #	var deadzone = 0.25
 #	if(turnTarget > -deadzone && turnTarget < deadzone):
