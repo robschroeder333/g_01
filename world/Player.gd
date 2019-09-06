@@ -1,7 +1,9 @@
 extends KinematicBody
 
-var walk = 3
-var run = 3
+var walk = 5
+var run = 15
+var gravity = 5
+var jumpStrength = 50
 var terminalVelocity = 3
 var direction = Vector3()
 var left = Vector2()
@@ -11,33 +13,25 @@ var view : Rect2
 var cSize = 150
 
 func _ready():
-	# Called when the node is added to the scene for the first time.
-	# Initialization here
 	view = get_viewport().get_visible_rect()
 	initCursor($Cursor_L, $Cursor_R)
 	pass
 
 func _physics_process(delta):
 	grounded = $GroundRay.is_colliding()
-	handleMovement(delta)
+	handleMovement()
 	analogInput()
 	handleCamera(left, right, delta)
 	handleCursors(left, right)
 
-#func _integrate_forces(state):
-#    var target_position = $Internal/Forward.get_global_transform().origin
-#    look_follow(state, get_global_transform(), target_position)
-#
-#func look_follow(state, current_transform, target_position):
-#	var adjuster = 30
-#	var up_dir = Vector3(0, 1, 0)
-#	var cur_dir = current_transform.basis.xform(Vector3(0, 0, 1))
-#	var target_dir = (target_position - current_transform.origin).normalized()
-#	var rotation_angle = acos(cur_dir.x) - acos(target_dir.x)
-#
-#	state.set_angular_velocity(up_dir * (rotation_angle / state.get_step() * adjuster))
+func handleMovement():
+	direction = Vector3(0,0,0)
+	direction += handleRun()
+#	direction += handleJump()
+	direction += handleGravity()
+	move_and_slide(direction)
 
-func handleMovement(d):
+func handleRun():
 	var speed = run # TODO: set walk vs run here
 	direction = Vector3(0,0,0)
 	if grounded:
@@ -49,42 +43,44 @@ func handleMovement(d):
 			direction.z += 1
 		if Input.is_action_pressed("i_back"):
 			direction.z -= 1
-		#needs to adjust to local rotation
+		# TODO: needs to adjust to local rotation
+		direction = direction.normalized()
 		direction *= run
-		move_and_slide(direction)
+	return direction
+		
+func handleJump():
 	if Input.is_action_just_pressed("i_jump") && grounded:
-		move_and_slide(Vector3(0,15,0))
-
+		return Vector3.UP * jumpStrength
+	return Vector3.ZERO
+	
+func handleGravity():
+	if !grounded:
+		return Vector3(0, -gravity, 0)
+	return Vector3.ZERO
+	
 func handleCamera(l, r, delta):
 	var combined = l + r
-	var h_speed = 1
+	var h_speed = 0.1
 	var v_speed = 5
-	var springBackSpeed = 1
+	var springBackSpeed = 0.5
 	var turnSpeed = 30
 	var i = $Internal
 	var target = $Internal/Forward
 
 	#Handle Horizontal
 	i.rotate_y(-combined.x * h_speed * delta)
-	#i.rotation_degrees.y = i.rotation_degrees.y + (0 - i.rotation_degrees.y) * springBackSpeed * 0.5 * delta
+	i.rotation_degrees.y = i.rotation_degrees.y + (0 - i.rotation_degrees.y) * springBackSpeed *2 * delta
 
-	#Handle vertical
+	#Handle Vertical
 	target.translation.y = clamp(target.translation.y + combined.y * v_speed * delta, -10, 10)
 	$Internal/Camera.look_at(target.get_global_transform().origin, Vector3.UP)
-	#TODO: make rotation on rigidbody impulse based
 
 	#Handle auto-turn
-	#turnTarget needs to be the local difference, not global
-	var turnTarget = transform.looking_at(i.get_transform().origin, Vector3.UP).basis.y.x# - transform.basis.y.x
-	print(turnTarget)
-#	var check = get_angular_velocity().y
-#	var deadzone = 0.25
-#	if(turnTarget > -deadzone && turnTarget < deadzone):
-#		self.add_torque(Vector3.ZERO)
-#	elif(turnTarget < -deadzone):
-#		self.add_torque(Vector3.UP * turnSpeed)
-#	elif(turnTarget > deadzone):
-#		self.add_torque(Vector3.UP * -turnSpeed)
+	var turnTarget = transform.looking_at(i.get_transform().origin, Vector3.UP).basis.y.x - transform.basis.y.x
+	print(i.rotation_degrees.y)
+	#TODO: figure out correct approach
+#	rotation_degrees.y = rotation_degrees.y + (i.rotation_degrees.y - rotation_degrees.y) * springBackSpeed *2 * delta
+#	rotate_y(i.rotation_degrees.y * springBackSpeed * delta)
 
 
 func handleCursors(l, r):

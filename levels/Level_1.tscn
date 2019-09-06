@@ -2,7 +2,7 @@
 
 [ext_resource path="res://world/Floor.tscn" type="PackedScene" id=1]
 [ext_resource path="res://world/Wall.tscn" type="PackedScene" id=2]
-[ext_resource path="res://world/tempPlayer.tscn" type="PackedScene" id=3]
+[ext_resource path="res://world/Player.tscn" type="PackedScene" id=3]
 
 [node name="Level_1" type="Node"]
 
@@ -27,5 +27,5 @@ transform = Transform( 0.688312, 0, -0.362706, 0, 1, 0, 1.45082, 0, 0.688314, -3
 [node name="Wall" parent="." instance=ExtResource( 2 )]
 transform = Transform( -4.37114e-007, 0, 1, 0, 5, 0, -10, 0, -4.37114e-008, -79, 4, 4 )
 
-[node name="tempPlayer" parent="." instance=ExtResource( 3 )]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.52546, 0 )
+[node name="Player" parent="." instance=ExtResource( 3 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.3115, 0 )
