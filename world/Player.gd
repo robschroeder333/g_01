@@ -2,7 +2,7 @@ extends KinematicBody
 
 var walk = 5
 var run = 15
-var gravity = 5
+var gravity = 1
 var jumpStrength = 50
 var terminalVelocity = 3
 var direction = Vector3()
@@ -19,21 +19,23 @@ func _ready():
 
 func _physics_process(delta):
 	grounded = $GroundRay.is_colliding()
-	handleMovement()
+	handleMovement(delta)
 	analogInput()
 	handleCamera(left, right, delta)
 	handleCursors(left, right)
 
-func handleMovement():
-	direction = Vector3(0,0,0)
-	direction += handleRun()
+func handleMovement(delta):
+	var velocity = Vector3.ZERO
+	var direction = Vector3.ZERO
+	direction += handleRun(delta)
 #	direction += handleJump()
-	direction += handleGravity()
-	move_and_slide(direction)
+	direction += handleGravity(delta)
+	velocity = direction
+	move_and_slide(velocity)
 
-func handleRun():
+func handleRun(d):
 	var speed = run # TODO: set walk vs run here
-	direction = Vector3(0,0,0)
+	direction = Vector3.ZERO
 	if grounded:
 		if Input.is_action_pressed("i_left"):
 			direction.x += 1
@@ -43,45 +45,44 @@ func handleRun():
 			direction.z += 1
 		if Input.is_action_pressed("i_back"):
 			direction.z -= 1
-		# TODO: needs to adjust to local rotation
 		direction = direction.normalized()
 		direction *= run
+		direction = transform.xform(direction)
 	return direction
+#	translate_object_local(direction)
 		
 func handleJump():
 	if Input.is_action_just_pressed("i_jump") && grounded:
 		return Vector3.UP * jumpStrength
-	return Vector3.ZERO
 	
-func handleGravity():
+func handleGravity(d):
 	if !grounded:
-		return Vector3(0, -gravity, 0)
+		return Vector3(0, -gravity, 0) * d
 	return Vector3.ZERO
 	
 func handleCamera(l, r, delta):
 	var combined = l + r
-	var h_speed = 0.1
+	var h_speed = 1
 	var v_speed = 5
-	var springBackSpeed = 0.5
-	var turnSpeed = 30
+	var springBackSpeed = 0.25
+	var turnSpeed = 50
 	var i = $Internal
 	var target = $Internal/Forward
 
 	#Handle Horizontal
-	i.rotate_y(-combined.x * h_speed * delta)
-	i.rotation_degrees.y = i.rotation_degrees.y + (0 - i.rotation_degrees.y) * springBackSpeed *2 * delta
+	rotate_y(-combined.x * h_speed * delta) #simple turning 
+#	i.rotate_y(-combined.x * h_speed * delta)
+#	i.rotation_degrees.y = i.rotation_degrees.y + (0 - i.rotation_degrees.y) * springBackSpeed * delta
 
 	#Handle Vertical
 	target.translation.y = clamp(target.translation.y + combined.y * v_speed * delta, -10, 10)
 	$Internal/Camera.look_at(target.get_global_transform().origin, Vector3.UP)
 
 	#Handle auto-turn
-	var turnTarget = transform.looking_at(i.get_transform().origin, Vector3.UP).basis.y.x - transform.basis.y.x
-	print(i.rotation_degrees.y)
+#	var turnTarget = transform.looking_at(i.get_transform().origin, Vector3.UP).basis.y.x - transform.basis.y.x
 	#TODO: figure out correct approach
-#	rotation_degrees.y = rotation_degrees.y + (i.rotation_degrees.y - rotation_degrees.y) * springBackSpeed *2 * delta
-#	rotate_y(i.rotation_degrees.y * springBackSpeed * delta)
-
+#	rotation_degrees.y = rotation_degrees.y + (i.rotation_degrees.y - rotation_degrees.y) * turnSpeed * delta
+#	print(i.rotation_degrees.y,',', rotation_degrees.y,',', i.rotation_degrees.y - rotation_degrees.y)
 
 func handleCursors(l, r):
 	var centering = cSize * 0.5

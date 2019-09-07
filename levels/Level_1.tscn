@@ -28,4 +28,4 @@ transform = Transform( 0.688312, 0, -0.362706, 0, 1, 0, 1.45082, 0, 0.688314, -3
 transform = Transform( -4.37114e-007, 0, 1, 0, 5, 0, -10, 0, -4.37114e-008, -79, 4, 4 )
 
 [node name="Player" parent="." instance=ExtResource( 3 )]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.3115, 0 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.08425, 0 )
