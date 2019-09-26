@@ -2,7 +2,11 @@ extends KinematicBody
 
 var walk = 5
 var run = 15
-var gravity = 1
+var gravity = -9.8
+var acceleration = 3
+var deceleration = 5
+var velocity = Vector3()
+
 var jumpStrength = 50
 var terminalVelocity = 3
 var direction = Vector3()
@@ -25,13 +29,25 @@ func _physics_process(delta):
 	handleCursors(left, right)
 
 func handleMovement(delta):
-	var velocity = Vector3.ZERO
-	var direction = Vector3.ZERO
-	direction += handleRun(delta)
-#	direction += handleJump()
-	direction += handleGravity(delta)
-	velocity = direction
-	move_and_slide(velocity)
+	var dir = handleRun(delta)
+	var grav = handleGravity(delta)
+	
+	velocity.y += grav
+	
+	var hv = velocity
+	hv.y = 0
+	
+	# TODO: adjust for rotation direction
+	var new_pos = dir * run
+	var accel = deceleration
+	if dir.dot(hv) > 0:
+		accel = acceleration
+	
+	hv = hv.linear_interpolate(new_pos, accel * delta)
+	
+	velocity.x = hv.x
+	velocity.z = hv.z
+	move_and_slide(velocity, Vector3.UP)
 
 func handleRun(d):
 	var speed = run # TODO: set walk vs run here
@@ -46,19 +62,16 @@ func handleRun(d):
 		if Input.is_action_pressed("i_back"):
 			direction.z -= 1
 		direction = direction.normalized()
-		direction *= run
-		direction = transform.xform(direction)
+#		direction *= speed
 	return direction
-#	translate_object_local(direction)
 		
 func handleJump():
 	if Input.is_action_just_pressed("i_jump") && grounded:
 		return Vector3.UP * jumpStrength
 	
 func handleGravity(d):
-	if !grounded:
-		return Vector3(0, -gravity, 0) * d
-	return Vector3.ZERO
+#	if !grounded:
+	return gravity * d
 	
 func handleCamera(l, r, delta):
 	var combined = l + r
