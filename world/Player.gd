@@ -82,7 +82,6 @@ func handleJump():
 		velocity.y = jumpStrength
 	
 func handleGravity(d):
-#	if !grounded:
 	return gravity * d
 	
 func handleCamera(l, r, delta):
