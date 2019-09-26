@@ -1,15 +1,14 @@
 extends KinematicBody
 
 var walk = 5
-var run = 15
+var run = 25
 var gravity = -9.8
-var acceleration = 3
-var deceleration = 5
+var acceleration
+var deceleration
 var velocity = Vector3()
 
-var jumpStrength = 50
+var jumpStrength = 20
 var terminalVelocity = 3
-var direction = Vector3()
 var left = Vector2()
 var right = Vector2()
 var grounded : bool
@@ -27,9 +26,13 @@ func _physics_process(delta):
 	analogInput()
 	handleCamera(left, right, delta)
 	handleCursors(left, right)
+	
+func _input(event):
+	handleJump()
+	pass
 
 func handleMovement(delta):
-	var dir = handleRun(delta)
+	var dir = handleWalkRun(delta)
 	var grav = handleGravity(delta)
 	
 	velocity.y += grav
@@ -37,37 +40,46 @@ func handleMovement(delta):
 	var hv = velocity
 	hv.y = 0
 	
-	# TODO: adjust for rotation direction
 	var new_pos = dir * run
+	
+	#Air Control
+	if !grounded:
+		acceleration = 0.1
+		deceleration = 0.1
+	#Ground Control
+	else:
+		acceleration = 2
+		deceleration = 3
 	var accel = deceleration
 	if dir.dot(hv) > 0:
 		accel = acceleration
 	
 	hv = hv.linear_interpolate(new_pos, accel * delta)
+	print(hv)
 	
 	velocity.x = hv.x
 	velocity.z = hv.z
 	move_and_slide(velocity, Vector3.UP)
 
-func handleRun(d):
+func handleWalkRun(d):
 	var speed = run # TODO: set walk vs run here
-	direction = Vector3.ZERO
-	if grounded:
-		if Input.is_action_pressed("i_left"):
-			direction.x += 1
-		if Input.is_action_pressed("i_right"):
-			direction.x -= 1
-		if Input.is_action_pressed("i_forward"):
-			direction.z += 1
-		if Input.is_action_pressed("i_back"):
-			direction.z -= 1
-		direction = direction.normalized()
-#		direction *= speed
+	var direction = Vector3.ZERO
+	var basis = get_transform().basis
+	
+	if Input.is_action_pressed("i_left"):
+		direction += basis.x
+	if Input.is_action_pressed("i_right"):
+		direction += -basis.x
+	if Input.is_action_pressed("i_forward"):
+		direction += basis.z
+	if Input.is_action_pressed("i_back"):
+		direction += -basis.z
+	direction = direction.normalized()
 	return direction
 		
 func handleJump():
 	if Input.is_action_just_pressed("i_jump") && grounded:
-		return Vector3.UP * jumpStrength
+		velocity.y = jumpStrength
 	
 func handleGravity(d):
 #	if !grounded:
