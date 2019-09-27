@@ -7,7 +7,7 @@ var acceleration
 var deceleration
 var velocity = Vector3()
 
-var jumpStrength = 20
+var jumpStrength = 10
 var terminalVelocity = 3
 var left = Vector2()
 var right = Vector2()
@@ -26,6 +26,7 @@ func _physics_process(delta):
 	analogInput()
 	handleCamera(left, right, delta)
 	handleCursors(left, right)
+	handleGrapple()
 	
 func _input(event):
 	handleJump()
@@ -55,7 +56,6 @@ func handleMovement(delta):
 		accel = acceleration
 	
 	hv = hv.linear_interpolate(new_pos, accel * delta)
-	print(hv)
 	
 	velocity.x = hv.x
 	velocity.z = hv.z
@@ -83,6 +83,16 @@ func handleJump():
 	
 func handleGravity(d):
 	return gravity * d
+	
+func handleGrapple():
+	var centering = Vector2(cSize * 0.5, cSize * 0.5)
+	var l = $Cursor_L.rect_position + centering
+	var r = $Cursor_R.rect_position + centering
+	#not returning correct projected value (maybe colliding with cursor itself?)
+	print($Internal/Camera.project_position(l))
+	var m = MeshInstance.new()
+	m.set_mesh(CubeMesh.new())
+	m.transform.origin = $Internal/Camera.project_position(l)
 	
 func handleCamera(l, r, delta):
 	var combined = l + r
