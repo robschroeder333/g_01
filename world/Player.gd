@@ -15,6 +15,7 @@ var grounded : bool
 var view : Rect2
 var cSize = 150
 
+
 func _ready():
 	view = get_viewport().get_visible_rect()
 	initCursor($Cursor_L, $Cursor_R)
@@ -22,18 +23,19 @@ func _ready():
 
 func _physics_process(delta):
 	grounded = $GroundRay.is_colliding()
-	handleMovement(delta)
+	Movement(delta)
 	analogInput()
-	handleCamera(left, right, delta)
-	handleCursors(left, right)
+	Camera(left, right, delta)
+	Cursors(left, right)
 	
 func _input(event):
-	handleJump()
+	Jump()
+	grapple()
 	pass
 
-func handleMovement(delta):
-	var dir = handleWalkRun(delta)
-	var grav = handleGravity(delta)
+func Movement(delta):
+	var dir = WalkRun(delta)
+	var grav = Gravity(delta)
 	
 	velocity.y += grav
 	
@@ -60,7 +62,7 @@ func handleMovement(delta):
 	velocity.z = hv.z
 	move_and_slide(velocity, Vector3.UP)
 
-func handleWalkRun(d):
+func WalkRun(d):
 	var speed = run # TODO: set walk vs run here
 	var direction = Vector3.ZERO
 	var basis = get_transform().basis
@@ -76,14 +78,14 @@ func handleWalkRun(d):
 	direction = direction.normalized()
 	return direction
 		
-func handleJump():
+func Jump():
 	if Input.is_action_just_pressed("i_jump") && grounded:
 		velocity.y = jumpStrength
 	
-func handleGravity(d):
+func Gravity(d):
 	return gravity * d
 	
-func handleCamera(l, r, delta):
+func Camera(l, r, delta):
 	var combined = l + r
 	var h_speed = 1
 	var v_speed = 5
@@ -92,22 +94,22 @@ func handleCamera(l, r, delta):
 	var i = $Internal
 	var target = $Internal/Forward
 
-	#Handle Horizontal
+	# Horizontal
 	rotate_y(-combined.x * h_speed * delta) #simple turning 
 #	i.rotate_y(-combined.x * h_speed * delta)
 #	i.rotation_degrees.y = i.rotation_degrees.y + (0 - i.rotation_degrees.y) * springBackSpeed * delta
 
-	#Handle Vertical
+	# Vertical
 	target.translation.y = clamp(target.translation.y + combined.y * v_speed * delta, -10, 10)
 	$Internal/Camera.look_at(target.get_global_transform().origin, Vector3.UP)
 
-	#Handle auto-turn
+	# auto-turn
 #	var turnTarget = transform.looking_at(i.get_transform().origin, Vector3.UP).basis.y.x - transform.basis.y.x
 	#TODO: figure out correct approach
 #	rotation_degrees.y = rotation_degrees.y + (i.rotation_degrees.y - rotation_degrees.y) * turnSpeed * delta
 #	print(i.rotation_degrees.y,',', rotation_degrees.y,',', i.rotation_degrees.y - rotation_degrees.y)
 
-func handleCursors(l, r):
+func Cursors(l, r):
 	var centering = cSize * 0.5
 	var bounds = view.size
 	var b_center = bounds.x * 0.5
@@ -139,3 +141,11 @@ func analogInput():
 	left.y = Input.get_action_strength("i_L_up") - Input.get_action_strength("i_L_down")
 	right.x = Input.get_action_strength("i_R_right") - Input.get_action_strength("i_R_left")
 	right.y = Input.get_action_strength("i_R_up") - Input.get_action_strength("i_R_down")
+	
+func grapple():
+	if Input.is_action_pressed("i_L_bumper"):
+		
+		print($Internal/Camera.unproject_position($Cursor_L.global_tranform.origin))
+		
+	if Input.is_action_pressed("i_R_bumper"):
+		print(right)
