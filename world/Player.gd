@@ -45,7 +45,7 @@ func handleMovement(delta):
 	#Air Control
 	if !grounded:
 		acceleration = 0.1
-		deceleration = 0.1
+		deceleration = 0.2
 	#Ground Control
 	else:
 		acceleration = 2
@@ -55,7 +55,6 @@ func handleMovement(delta):
 		accel = acceleration
 	
 	hv = hv.linear_interpolate(new_pos, accel * delta)
-	print(hv)
 	
 	velocity.x = hv.x
 	velocity.z = hv.z
