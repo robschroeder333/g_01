@@ -10,7 +10,9 @@ var velocity = Vector3()
 var jumpStrength = 20
 var terminalVelocity = 3
 var left = Vector2()
+var t_left = Vector2()
 var right = Vector2()
+var t_right = Vector2()
 var grounded : bool
 var view : Rect2
 var cSize = 150
@@ -117,8 +119,8 @@ func Cursors(l, r):
 	var xLimit = bounds.x * 0.25
 	var leftStart = Vector2(xLimit, yLimit)
 	var rightStart = Vector2(bounds.x * 0.75, yLimit)
-	var t_left = leftStart + (Vector2(l.x * b_center, -l.y * bounds.y * 0.75))
-	var t_right = rightStart + (Vector2(r.x * b_center, -r.y * bounds.y * 0.75))
+	t_left = leftStart + (Vector2(l.x * b_center, -l.y * bounds.y * 0.75))
+	t_right = rightStart + (Vector2(r.x * b_center, -r.y * bounds.y * 0.75))
 
 	t_left = Vector2(clamp(t_left.x, 0, b_center), clamp(t_left.y, 0, bounds.y))
 	t_right = Vector2(clamp(t_right.x, b_center, bounds.x), clamp(t_right.y, 0, bounds.y))
@@ -144,8 +146,25 @@ func analogInput():
 	
 func grapple():
 	if Input.is_action_pressed("i_L_bumper"):
+		var origin = $Internal/Camera.project_ray_origin(t_left)
+		var vector = $Internal/Camera.project_ray_normal(t_left)		
+		var l_cast = RayCast.new()
+		l_cast.set_cast_to(vector - origin)
+		l_cast.set_enabled(true)
 		
-		print($Internal/Camera.unproject_position($Cursor_L.global_tranform.origin))
+		#drawline($Internal/Camera/g_left, $LeftHip.global_transform.origin, l_cast)
+		$LeftHip.global_transform.origin = l_cast.get_collision_point()
+		print(l_cast.get_collision_point())
+	else:
+		$LeftHip.global_transform = global_transform
 		
 	if Input.is_action_pressed("i_R_bumper"):
-		print(right)
+		print(t_right)
+
+func drawline(grapple, a, b):
+	grapple.clear()
+	grapple.begin(Mesh.PRIMITIVE_LINES)
+	grapple.set_color(Color(1, 0, 0, 1))
+	grapple.add_vertex(a)
+	grapple.add_vertex(b)
+	grapple.end()
